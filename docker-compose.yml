@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+
+    # API
+    api:
+        build: ./api
+        container_name: api_container
+        volumes:
+            - ./api/src:/api/src
+        command: flask run -h 0.0.0.0 --port 5000
+        tty: true
+        ports:
+            - "5000:5000"
+
+    # MySQL
+    db:
+        image: mysql:5.7
+        container_name: mysql_container
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+        volumes:
+            - ./mysql/data:/var/lib/mysql
+            - ./mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf
+            - ./mysql/initialize:/docker-entrypoint-initdb.d
+        command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+        ports:
+            - 3306:3306
+
+    # phpMyAdmin
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin_container
+        environment:
+            - PMA_ARBITRARY=1
+            - PMA_HOSTS=mysql_container
+            - PMA_USER=root
+            - PMA_PASSWORD=root
+        ports:
+            - 8080:80
+
+    # ubuntu
+    ubuntu:
+        image: ubuntu
+        command: /bin/bash
+        tty: true
+        container_name: ubuntu_container
