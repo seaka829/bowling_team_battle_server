@@ -13,8 +13,8 @@ def create_app():
     init_db(app)
 
     api = Api(app)
-    api.add_resource(M01_userListAPI, '/v1/hoges')
-    api.add_resource(M01_userAPI, '/v1/hoges/<user_id>')
+    api.add_resource(M01_userListAPI, '/v1/api')
+    api.add_resource(M01_userAPI, '/v1/api/login')
 
     return app
 

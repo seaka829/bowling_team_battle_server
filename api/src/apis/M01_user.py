@@ -45,47 +45,20 @@ class M01_userAPI(Resource):
         res = M01_userSchema().dump(M01_user)
         return res
 
-    def put(self, user_id):
+    def post(self):
         args = self.reqparse.parse_args()
         input_pwd = args.pwd
+        input_user_id = args.user_id
         # ユーザーマスタからユーザー情報を取得
-        M01_user = db.session.query(M01_userModel).filter_by(user_id=user_id, pwd=input_pwd).first()
+        M01_user = db.session.query(M01_userModel).filter_by(user_id=input_user_id, pwd=input_pwd).first()
         # ユーザー情報を取得できなかった場合
         if M01_user is None:
             return jsonify({
                 "message": "ユーザーIDまたはパスワードが間違っています。"
             })
-        new_pwd = args.new_pwd
-        new_mail = args.new_mail
-        if new_pwd is not None:
-            setattr(M01_user, pwd, new_pwd)
-
-        if new_mail is not None:
-            setattr(M01_user, mail, new_mail)
-
         
-        # 更新処理を実行
-        db.session.add(M01_user)
-        db.session.commit()
-        return None, 204
+        res = M01_userSchema().dump(M01_user)
+        return res, 201
 
-    def delete(self, user_id):
-        args = self.reqparse.parse_args()
-        input_pwd = args.pwd
-        # ユーザーマスタからユーザー情報を取得
-        M01_user = db.session.query(M01_userModel).filter_by(user_id=user_id, pwd=input_pwd).first()
-        # ユーザー情報を取得できた場合
-        if M01_user is not None:
-            # 削除処理を実行
-            db.session.delete(M01_user)
-            db.session.commit()
-        
-        # ユーザー情報を取得できなかった場合
-        else:
-            return jsonify({
-                "message": "ユーザーIDまたはパスワードが間違っています。"
-            })
-        
-        return None, 204
 
     
