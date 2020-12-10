@@ -1,52 +1,21 @@
 from flask import Flask, jsonify, session, request
-from util import random_string
+from flask_restful import Api
+from src.database import init_db
+from src.apis.M01_user import M01_userListAPI, M01_userAPI
+from src.util import random_string
 
+def create_app():
+    app = Flask(__name__)
+    app.secret_key = 'app secret key'
+    app.config['JSON_AS_ASCII'] = False
+    app.config.from_object('src.config.Config')
 
-app = Flask(__name__)
-app.secret_key = 'app secret key'
-app.config['JSON_AS_ASCII'] = False
+    init_db(app)
 
-@app.route('/')
-def index():
-    return jsonify({
-        "message": random_string(100)
-    })
+    api = Api(app)
+    api.add_resource(M01_userListAPI, '/v1/hoges')
+    api.add_resource(M01_userAPI, '/v1/hoges/<user_id>')
 
-@app.route('/login')
-def login():
-    session.permanent = True
-    #app.permanent_session_lifetime = timedelta(minutes=30)
-    if session["user_id" ] is not None:
-        session["user_id"] = request.args.get('user_id')
-        return jsonify({
-            "state": "login success"
-            ,"user_id": request.args.get('user_id')
-        })
-    else:
-        return jsonify({
-            "state": "logined"
-            ,"user_id": request.args.get('user_id')
-        })
-    
-@app.route('/logout')
-def logout():
-    if session["user_id"] is not None:
-        session["user_id"] = None
-        return "logout"
-    else:
-        return "not login"
+    return app
 
-@app.route('/create_room_id', methods=["POST"])
-def create_room_id():
-    return jsonify({
-        "room_id": "qwertyuiopasdfghjklz"
-    })
-
-@app.route('/enter_room', methods=["POST"])
-def enter_room():
-    return jsonify({
-        "test": "11"
-    })
-
-if __name__ == '__main__':
-    app.run()
+app = create_app()

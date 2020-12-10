@@ -7,8 +7,9 @@ WORKDIR /api
 
 ADD module/ ./module
 
-ENV FLASK_APP ./src/app.py
+ENV FLASK_APP ./src/run.py
 ENV FLASK_ENV development
+ENV TZ Asia/Tokyo
 
 RUN pip install --upgrade pip --no-cache-dir
 RUN pip install -r ./module/requirements.txt --no-cache-dir
